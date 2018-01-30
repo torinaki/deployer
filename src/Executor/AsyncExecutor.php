@@ -19,6 +19,7 @@ use Deployer\Exception\GracefulShutdownException;
 use Deployer\Host\Host;
 use Deployer\Host\Localhost;
 use Deployer\Host\Storage;
+use Deployer\Task\AsyncTask;
 use Deployer\Task\Context;
 use Deployer\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,25 +62,31 @@ class AsyncExecutor implements ExecutorInterface
         $this->informer = $informer;
         $this->console = $console;
     }
+
     /**
-     * @param Task[] $tasks
+     * @param AsyncTask[] $tasks
      * @param Host[] $hosts
+     *
+     * @throws LogicException
      */
     public function run($tasks, $hosts)
     {
         $localhost = new Localhost();
         Loop::run(function () use ($tasks, $localhost, $hosts) {
             foreach ($tasks as $task) {
+                if (!$task instanceof AsyncTask) {
+                    throw new LogicException('Only async tasks are supported');
+                }
                 $success = true;
                 $this->informer->startTask($task);
 
                 if ($task->isLocal()) {
-                    $task->run(new Context($localhost, $this->input, $this->output));
+                    yield from $task->run(new Context($localhost, $this->input, $this->output));
                 } else {
                     foreach ($hosts as $host) {
                         if ($task->shouldBePerformed($host)) {
                             try {
-                                $task->run(new Context($host, $this->input, $this->output));
+                                yield from $task->run(new Context($host, $this->input, $this->output));
                             } catch (NonFatalException $exception) {
                                 $success = false;
                                 $this->informer->taskException($exception, $host);

@@ -20,7 +20,7 @@ class Task
     /**
      * @var callable
      */
-    private $callback;
+    protected $callback;
 
     /**
      * @var string
@@ -312,5 +312,15 @@ class Task
     public function isShallow()
     {
         return $this->shallow;
+    }
+
+    protected function setHasRun($flag)
+    {
+        $this->hasRun = (bool) $flag;
+    }
+
+    protected function getCallback()
+    {
+        return $this->callback;
     }
 }
