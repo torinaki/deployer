@@ -58,6 +58,12 @@ class TaskCommand extends Command
             'Run tasks in parallel'
         );
         $this->addOption(
+            'async',
+            'a',
+            Option::VALUE_NONE,
+            'Run tasks in async context'
+        );
+        $this->addOption(
             'limit',
             'l',
             Option::VALUE_REQUIRED,
@@ -134,6 +140,8 @@ class TaskCommand extends Command
 
         if ($input->getOption('parallel')) {
             $executor = $this->deployer->parallelExecutor;
+        } elseif ($input->getOption('async')) {
+            $executor = $this->deployer->asyncExecutor;
         } else {
             $executor = $this->deployer->seriesExecutor;
         }

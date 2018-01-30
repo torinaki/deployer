@@ -18,6 +18,7 @@ use Deployer\Console\RunCommand;
 use Deployer\Console\SshCommand;
 use Deployer\Console\TaskCommand;
 use Deployer\Console\WorkerCommand;
+use Deployer\Executor\AsyncExecutor;
 use Deployer\Executor\ParallelExecutor;
 use Deployer\Executor\SeriesExecutor;
 use Deployer\Logger\Handler\FileHandler;
@@ -49,6 +50,7 @@ use function Deployer\Support\array_merge_alternate;
  * @property Host\HostSelector hostSelector
  * @property SeriesExecutor seriesExecutor
  * @property ParallelExecutor parallelExecutor
+ * @property AsyncExecutor asyncExecutor
  * @property Informer informer
  * @property Logger logger
  * @property ProcessOutputPrinter pop
@@ -135,6 +137,9 @@ class Deployer extends Container
         };
         $this['parallelExecutor'] = function ($c) {
             return new ParallelExecutor($c['input'], $c['output'], $c['informer'], $c['console']);
+        };
+        $this['asyncExecutor'] = function ($c) {
+            return new AsyncExecutor($c['input'], $c['output'], $c['informer'], $c['console']);
         };
 
         /******************************
