@@ -31,8 +31,8 @@ use Symfony\Component\Console\Input\InputOption;
  * Facts
  */
 
-set('hostname', function () {
-    return Context::get()->getHost()->getHostname();
+set('hostname', function (Context $context = null) {
+    return ($context ?? Context::get())->getHost()->getHostname();
 });
 
 set('user', function () {

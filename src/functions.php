@@ -271,13 +271,16 @@ function within($path, $callback)
  *
  * @param string $command
  * @param array $options
+ * @param Context|null $context
+ *
  * @return string
  */
-function run($command, $options = [])
+function run($command, $options = [], Context $context = null)
 {
+    $context = $context ?? Context::get();
     $client = Deployer::get()->sshClient;
     $process = Deployer::get()->processRunner;
-    $host = Context::get()->getHost();
+    $host = $context->getHost();
     $hostname = $host->getHostname();
 
     $command = parse($command);
@@ -401,10 +404,12 @@ function roles(...$roles)
  *
  * @experimental
  * @param string $task
+ * @param Context|null $context
  */
-function invoke($task)
+function invoke($task, Context $context = null)
 {
-    $hosts = [Context::get()->getHost()];
+    $context = $context ?? Context::get();
+    $hosts = [$context->getHost()];
     $tasks = Deployer::get()->scriptManager->getTasks($task, $hosts);
 
     $executor = Deployer::get()->seriesExecutor;
@@ -417,11 +422,13 @@ function invoke($task)
  * @param string $source
  * @param string $destination
  * @param array $config
+ * @param Context|null $context
  */
-function upload($source, $destination, array $config = [])
+function upload($source, $destination, array $config = [], Context $context = null)
 {
+    $context = $context ?? Context::get();
     $rsync = Deployer::get()->rsync;
-    $host = Context::get()->getHost();
+    $host = $context->getHost();
     $source = parse($source);
     $destination = parse($destination);
 
@@ -442,14 +449,16 @@ function upload($source, $destination, array $config = [])
 /**
  * Download file or directory from host
  *
- * @param string $destination
  * @param string $source
+ * @param string $destination
  * @param array $config
+ * @param Context|null $context
  */
-function download($source, $destination, array $config = [])
+function download($source, $destination, array $config = [], Context $context = null)
 {
+    $context = $context ?? Context::get();
     $rsync = Deployer::get()->rsync;
-    $host = Context::get()->getHost();
+    $host = $context->getHost();
     $source = parse($source);
     $destination = parse($destination);
 
@@ -492,13 +501,14 @@ function write($message, $options = 0)
  *
  * @param string $name
  * @param mixed $value
+ * @param Context|null $context
  */
-function set($name, $value)
+function set($name, $value, Context $context = null)
 {
-    if (!Context::has()) {
+    if (!Context::has() && $context === null) {
         Deployer::setDefault($name, $value);
     } else {
-        Context::get()->getConfig()->set($name, $value);
+        ($context ?? Context::get())->getConfig()->set($name, $value);
     }
 }
 
@@ -507,13 +517,14 @@ function set($name, $value)
  *
  * @param string $name
  * @param array $array
+ * @param Context|null $context
  */
-function add($name, $array)
+function add($name, $array, Context $context = null)
 {
-    if (!Context::has()) {
+    if (!Context::has() && $context === null) {
         Deployer::addDefault($name, $array);
     } else {
-        Context::get()->getConfig()->add($name, $array);
+        ($context ?? Context::get())->getConfig()->add($name, $array);
     }
 }
 
@@ -522,14 +533,16 @@ function add($name, $array)
  *
  * @param string $name
  * @param mixed|null $default
+ * @param Context|null $context
+ *
  * @return mixed
  */
-function get($name, $default = null)
+function get($name, $default = null, Context $context = null)
 {
-    if (!Context::has()) {
+    if (!Context::has() && $context === null) {
         return Deployer::getDefault($name, $default);
     } else {
-        return Context::get()->getConfig()->get($name, $default);
+        return ($context ?? Context::get())->getConfig()->get($name, $default);
     }
 }
 
@@ -537,14 +550,16 @@ function get($name, $default = null)
  * Check if there is such configuration option.
  *
  * @param string $name
+ * @param Context|null $context
+ *
  * @return boolean
  */
-function has($name)
+function has($name, Context $context = null)
 {
-    if (!Context::has()) {
+    if (!Context::has() && $context === null) {
         return Deployer::hasDefault($name);
     } else {
-        return Context::get()->getConfig()->has($name);
+        return ($context ?? Context::get())->getConfig()->has($name);
     }
 }
 
@@ -668,18 +683,18 @@ function askHiddenResponse($message)
 /**
  * @return InputInterface
  */
-function input()
+function input(Context $context = null)
 {
-    return Context::get()->getInput();
+    return ($context ?? Context::get())->getInput();
 }
 
 
 /**
  * @return OutputInterface
  */
-function output()
+function output(Context $context = null)
 {
-    return Context::get()->getOutput();
+    return ($context ?? Context::get())->getOutput();
 }
 
 /**
@@ -737,11 +752,13 @@ function commandSupportsOption($command, $option)
  * Parse set values.
  *
  * @param string $value
+ * @param Context|null $context
+ *
  * @return string
  */
-function parse($value)
+function parse($value, Context $context = null)
 {
-    return Context::get()->getConfig()->parse($value);
+    return ($context ?? Context::get())->getConfig()->parse($value);
 }
 
 function locateBinaryPath($name)

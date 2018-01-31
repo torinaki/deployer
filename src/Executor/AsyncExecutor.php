@@ -13,19 +13,14 @@ namespace Deployer\Executor;
 use Amp\Loop;
 use Deployer\Console\Application;
 use Deployer\Console\Output\Informer;
-use Deployer\Console\Output\VerbosityString;
-use Deployer\Exception\Exception;
-use Deployer\Exception\GracefulShutdownException;
+use Deployer\Exception\LogicException;
+use Deployer\Exception\NonFatalException;
 use Deployer\Host\Host;
 use Deployer\Host\Localhost;
-use Deployer\Host\Storage;
 use Deployer\Task\AsyncTask;
 use Deployer\Task\Context;
-use Deployer\Task\Task;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
-use Deployer\Exception\NonFatalException;
 
 class AsyncExecutor implements ExecutorInterface
 {

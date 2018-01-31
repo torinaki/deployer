@@ -12,10 +12,11 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 desc('Print host configuration');
-task('config:dump', function () {
-    $host = Context::get()->getHost();
+task('config:dump', function (Context $context = null) {
+    $context = $context ?? Context::get();
+    $host = $context->getHost();
     $common = Deployer::get()->config;
-    $config = Context::get()->getConfig();
+    $config = $context->getConfig();
     $dump = [];
 
     foreach ($common as $name => $value) {
